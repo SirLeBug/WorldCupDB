@@ -1,0 +1,33 @@
+Total number of goals in all games from both teams combined:
+SELECT SUM(winner_goals) + SUM(opponent_goals) AS total_goals FROM games
+
+Average number of goals in all games from the winning teams:
+SELECT AVG(winner_goals) AS average_winner_goals FROM games
+
+Average number of goals in all games from the winning teams rounded to two decimal places:
+SELECT AVG(winner_goals)::NUMERIC(10,2) AS average_winner_goals FROM games
+
+Average number of goals in all games from both teams:
+SELECT AVG(winner_goals) AS average_winner_goals, AVG(opponent_goals) AS average_opponent_goals FROM games
+
+Most goals scored in a single game by one team:
+SELECT winner_goals AS goals FROM games UNION SELECT opponent_goals AS goals FROM games ORDER BY goals DESC LIMIT 1;
+
+Number of games where the winning team scored more than two goals:
+SELECT COUNT(winner_id) AS games FROM games WHERE winner_goals >= 2;
+
+Winner of the 2018 tournament team name:
+SELECT name FROM teams WHERE team_id = (SELECT winner_id FROM games WHERE year = 2018 AND round = 'Final');
+
+List of teams who played in the 2014 'Eighth-Final' round:
+SELECT name FROM teams WHERE team_id IN (SELECT winner_id FROM games WHERE year = 2014 AND round = 'Eighth-Final' UNION SELECT opponent_id FROM games WHERE year = 2014 AND round = 'Eighth-Final');
+
+List of unique winning team names in the whole data set:
+SELECT name FROM teams WHERE team_id IN (SELECT winner_id FROM games);
+
+Year and team name of all the champions:
+SELECT games.year, teams.name FROM games JOIN teams ON games.winner_id = teams.team_id WHERE games.round = 'Final';
+SELECT year, (SELECT name FROM teams WHERE teams.team_id = games.winner_id) FROM games WHERE round = 'Final';
+
+List of teams that start with 'Co':
+SELECT name FROM teams WHERE name ~ '^Co'
